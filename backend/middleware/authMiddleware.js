@@ -1,22 +1,25 @@
 const jwt = require("jsonwebtoken");
 
-module.exports = function (req, res, next) {
-  const authHeader = req.header("Authorization");
+// This secret should match your .env file
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
-  if (!authHeader) {
-    return res.status(401).json({ msg: "No token, authorization denied" });
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(" ")[0] === "Bearer"
+    ? authHeader.split(" ")[1]
+    : authHeader;
+
+  if (!token) {
+    return res.status(401).json({ message: "Access Denied: No token provided" });
   }
-
-  // Remove 'Bearer ' prefix if it exists
-const token = req.header("Authorization"); // correct for raw token
-
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.userId; // Save userId into req.user
-    next(); // Proceed to the next middleware
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.userId = decoded.userId;
+    next();
   } catch (err) {
-    console.error("Token validation failed:", err.message);
-    res.status(401).json({ msg: "Token is not valid" });
+    return res.status(403).json({ message: "Invalid token" });
   }
 };
+
+module.exports = { authenticateToken };

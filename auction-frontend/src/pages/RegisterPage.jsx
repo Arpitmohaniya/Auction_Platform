@@ -1,10 +1,14 @@
-// src/pages/RegisterPage.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../axios"; // Make sure axios.js exists
+import { useNavigate, Link } from "react-router-dom";
+import api from "../axios";
+import styles from "./RegisterPage.module.css"; // ✅ Import the CSS Module
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,36 +22,53 @@ export default function RegisterPage() {
       localStorage.setItem("token", res.data.token);
       navigate("/dashboard");
     } catch (err) {
+      console.error("❌ Register error:", err.response?.data || err.message);
       alert("Registration failed");
     }
   };
 
   return (
-    <form onSubmit={handleRegister}>
-      <h2>Register</h2>
-      <input
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-        placeholder="Name"
-        required
-      />
-      <input
-        name="email"
-        value={form.email}
-        onChange={handleChange}
-        placeholder="Email"
-        required
-      />
-      <input
-        name="password"
-        type="password"
-        value={form.password}
-        onChange={handleChange}
-        placeholder="Password"
-        required
-      />
-      <button type="submit">Register</button>
-    </form>
+    <div className={styles.container}>
+      <form onSubmit={handleRegister} className={styles.form}>
+        <h2 className={styles.title}>Register</h2>
+
+        <input
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Full Name"
+          required
+          className={styles.input}
+        />
+
+        <input
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+          placeholder="Email"
+          required
+          className={styles.input}
+        />
+
+        <input
+          name="password"
+          type="password"
+          value={form.password}
+          onChange={handleChange}
+          placeholder="Password"
+          required
+          className={styles.input}
+        />
+
+        <button type="submit" className={styles.button}>
+          Register
+        </button>
+
+        <p className={styles.link}>
+          Already have an account? <Link to="/login">Login here</Link>
+        </p>
+      </form>
+    </div>
   );
 }

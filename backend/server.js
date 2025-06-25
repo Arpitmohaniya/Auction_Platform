@@ -18,7 +18,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.error("Mongo Error:", err));
 
 app.use("/api/auth", require("./routes/auth"));
-app.use("/api/auctions", require("./routes/auction"));
+app.use("/api/auction", require("./routes/auction"));
 
 app.get("/", (req, res) => {
   res.send("✅ Backend is working!");
