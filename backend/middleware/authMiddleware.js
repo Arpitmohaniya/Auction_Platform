@@ -1,25 +1,29 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-// This secret should match your .env file
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
-
-const authenticateToken = (req, res, next) => {
+module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[0] === "Bearer"
-    ? authHeader.split(" ")[1]
-    : authHeader;
+  const token =
+    authHeader && authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : null;
 
   if (!token) {
-    return res.status(401).json({ message: "Access Denied: No token provided" });
+    return res.status(401).json({ message: "No token provided" });
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.userId = decoded.userId;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.userId).select("-password");
+
+    console.log("✅ AUTH user:", req.user); // 👉 ADD THIS
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
     next();
   } catch (err) {
-    return res.status(403).json({ message: "Invalid token" });
+    console.error(err);
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
-
-module.exports = { authenticateToken };

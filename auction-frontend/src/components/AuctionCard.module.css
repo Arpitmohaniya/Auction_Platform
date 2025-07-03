@@ -1,0 +1,53 @@
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.image {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+
+h3 {
+  margin: 0 0 10px 0;
+}
+
+p {
+  margin: 6px 0;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.bidButton,
+.payButton {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.payButton {
+  background: #28a745;
+}
+
+.bidButton:hover {
+  background: #0056b3;
+}
+
+.payButton:hover {
+  background: #1e7e34;
+}

@@ -1,0 +1,143 @@
+/* Dashboard.module.css */
+
+.wrapper {
+  display: flex;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background: #111;
+  color: #fff;
+  padding: 20px;
+  transition: left 0.3s ease;
+  z-index: 999;
+}
+
+.drawerOpen {
+  left: 0;
+}
+
+.closeBtn {
+  background: none;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.drawerTitle {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.menuList {
+  list-style: none;
+  padding: 0;
+  line-height: 2.2;
+}
+
+.menuList a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.toggleBtn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.page {
+  flex: 1;
+  margin-left: 70px;
+  padding: 40px;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(to right, #fceabb, #f8b500);
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 32px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.image {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+  object-fit: cover;
+  max-height: 180px;
+}
+
+.owner {
+  margin-top: 10px;
+  font-style: italic;
+  font-size: 14px;
+  color: #555;
+}
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.bidButton {
+  flex: 1;
+  padding: 10px 0;
+  background-color: #4ade80;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.payButton {
+  flex: 1;
+  padding: 10px 0;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.deleteButton {
+  background: #e63946;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 8px;
+}

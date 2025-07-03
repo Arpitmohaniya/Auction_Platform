@@ -7,39 +7,62 @@ export default function AddAuctionPage() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    startingBid: "",
+    startingBid: "", // Will handle this correctly below
   });
-
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
   const navigate = useNavigate();
 
+  // ✅ Handles text input fields
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // 👇 Make sure startingBid stays a number
+    if (name === "startingBid") {
+      setForm({ ...form, [name]: value.replace(/[^0-9]/g, "") });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
+  // ✅ Handles file input
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    } else {
+      setPreview(null);
+    }
+  };
+
+  // ✅ Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+
+    // 👇 Ensure startingBid is a real number (send as string is fine with FormData)
+    formData.append("startingBid", Number(form.startingBid));
+
+    if (image) {
+      formData.append("image", image);
+    }
+
     try {
-      const token = localStorage.getItem("token");
-
-      await api.post(
-        "/auction", 
-        {
-          title: form.title,
-          description: form.description,
-          startingBid: parseFloat(form.startingBid),
+      await api.post("/auction", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // ✅ use "Bearer <token>"
-          },
-        }
-      );
-
-      alert("Auction created successfully!");
+      });
       navigate("/dashboard");
     } catch (err) {
-      console.error("❌ Create auction error:", err.response?.data || err.message);
       alert("Failed to create auction: " + (err.response?.data?.message || err.message));
+      console.error("❌ Create auction error:", err.response?.data || err.message);
     }
   };
 
@@ -56,7 +79,8 @@ export default function AddAuctionPage() {
           onChange={handleChange}
           required
         />
-        <input
+
+        <textarea
           name="description"
           className={styles.input}
           placeholder="Description"
@@ -64,6 +88,7 @@ export default function AddAuctionPage() {
           onChange={handleChange}
           required
         />
+
         <input
           name="startingBid"
           className={styles.input}
@@ -72,7 +97,21 @@ export default function AddAuctionPage() {
           value={form.startingBid}
           onChange={handleChange}
           required
+          min="0"
         />
+
+        <input
+          type="file"
+          accept="image/*"
+          className={styles.input}
+          onChange={handleImageChange}
+          required
+        />
+
+        {preview && (
+          <img src={preview} alt="Preview" className={styles.preview} />
+        )}
+
         <button type="submit" className={styles.button}>
           Create Auction
         </button>

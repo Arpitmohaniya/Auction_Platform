@@ -16,6 +16,7 @@ export default function LoginPage() {
     try {
       const res = await api.post("/auth/login", form);
       localStorage.setItem("token", res.data.token);
+      console.log("✅ Token saved:", res.data.token);
       navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message);
