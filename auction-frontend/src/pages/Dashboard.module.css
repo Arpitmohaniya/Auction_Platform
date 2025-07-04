@@ -1,80 +1,93 @@
 /* Dashboard.module.css */
 
 .wrapper {
-  display: flex;
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .drawer {
   position: fixed;
   top: 0;
-  left: -250px;
+  left: -250px; /* Hidden by default */
   width: 250px;
   height: 100%;
-  background: #111;
+  background: #102e2f; /* Dark background */
   color: #fff;
-  padding: 20px;
   transition: left 0.3s ease;
-  z-index: 999;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
+  padding: 2rem 1rem;
+  z-index: 1000;
 }
 
 .drawerOpen {
-  left: 0;
+  left: 0; /* Slide in */
 }
 
 .closeBtn {
   background: none;
-  color: #fff;
   border: none;
-  font-size: 20px;
+  color: #fff;
+  font-size: 1.5rem;
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 }
 
 .drawerTitle {
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
 }
 
 .menuList {
   list-style: none;
   padding: 0;
-  line-height: 2.2;
+}
+
+.menuList li {
+  margin: 1rem 0;
 }
 
 .menuList a {
   color: #fff;
   text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.menuList a:hover {
+  color: #00c6ff;
 }
 
 .toggleBtn {
   position: fixed;
-  top: 20px;
-  left: 20px;
-  font-size: 24px;
-  background: #111;
+  top: 1rem;
+  left: 1rem;
+  background: #1e1e2f;
   color: #fff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
   cursor: pointer;
-  z-index: 1000;
+  border-radius: 4px;
+  z-index: 1100;
 }
 
+
 .page {
-  flex: 1;
-  margin-left: 70px;
-  padding: 40px;
-  font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(to right, #fceabb, #f8b500);
-  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+  margin-left: 0;
+  padding: 2rem;
+}
+
+.pageShift {
+  margin-left: 250px; 
 }
 
 .title {
-  font-size: 32px;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #333;
+  font-size: 2rem;
+  margin-bottom: 1rem;
 }
+
 
 .grid {
   display: grid;

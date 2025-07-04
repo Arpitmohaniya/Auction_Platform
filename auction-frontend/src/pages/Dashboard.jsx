@@ -60,9 +60,17 @@ export default function Dashboard() {
         </button>
         <h3 className={styles.drawerTitle}>Dashboard Menu</h3>
         <ul className={styles.menuList}>
-          <li><a href="/dashboard">🏠 Home</a></li>
-          <li><a href="/">🔒 Logout</a></li>
-        </ul>
+        <li>
+            <a href="/dashboard" onClick={() => setDrawerOpen(false)}>
+                 🏠 Home
+            </a>
+        </li>
+        <li>
+           <a href="/" onClick={() => setDrawerOpen(false)}>
+             🔒 Logout
+           </a>
+        </li>
+       </ul>
       </div>
 
       {/* Toggle Drawer Button */}
@@ -70,8 +78,8 @@ export default function Dashboard() {
         ☰
       </button>
 
-      <div className={styles.page}>
-        <h1 className={styles.title}>🏷️ All Auctions</h1>
+          <div className={drawerOpen ? `${styles.page} ${styles.pageShift}` : styles.page}>
+          <h1 className={styles.title}>🏷️ All Auctions</h1>
 
         <div className={styles.grid}>
           {auctions.length ? (
