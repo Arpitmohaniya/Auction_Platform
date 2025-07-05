@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "../axios";
-import styles from "./Dashboard.module.css"; // ✅ Import CSS module
+import styles from "./Dashboard.module.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [auctions, setAuctions] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false); // ✅ New
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const navigate = useNavigate(); // ✅ For navigation
 
   useEffect(() => {
     const fetchAuctions = async () => {
@@ -14,7 +17,6 @@ export default function Dashboard() {
         console.log("Fetched auctions:", res.data.auctions);
         setAuctions(res.data.auctions);
 
-        // ✅ Also fetch user role
         const token = localStorage.getItem("token");
         if (token) {
           const userRes = await api.get("/auth/me", {
@@ -24,7 +26,6 @@ export default function Dashboard() {
             setIsAdmin(true);
           }
         }
-
       } catch (err) {
         console.error("❌ Error fetching auctions:", err);
       }
@@ -32,7 +33,7 @@ export default function Dashboard() {
     fetchAuctions();
   }, []);
 
-  // ✅ Delete handler for admin only
+  // ✅ Delete handler
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this auction?")) return;
 
@@ -46,11 +47,15 @@ export default function Dashboard() {
       console.error("❌ Error deleting auction:", err);
     }
     console.log("📦 Token in localStorage:", localStorage.getItem("token"));
+  };
 
+  // ✅ Pay handler
+  const handlePay = (auctionId) => {
+    navigate("/payment");
   };
 
   return (
-    <div className={styles.wrapper}> 
+    <div className={styles.wrapper}>
       {/* Drawer */}
       <div
         className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}
@@ -60,17 +65,22 @@ export default function Dashboard() {
         </button>
         <h3 className={styles.drawerTitle}>Dashboard Menu</h3>
         <ul className={styles.menuList}>
-        <li>
+          <li>
             <a href="/dashboard" onClick={() => setDrawerOpen(false)}>
-                 🏠 Home
+              🏠 Home
             </a>
-        </li>
-        <li>
-           <a href="/" onClick={() => setDrawerOpen(false)}>
-             🔒 Logout
-           </a>
-        </li>
-       </ul>
+          </li>
+          <li>
+            <a href="/payment" onClick={() => setDrawerOpen(false)}>
+              💳 Payment
+            </a>
+          </li>
+          <li>
+            <a href="/" onClick={() => setDrawerOpen(false)}>
+              🔒 Logout
+            </a>
+          </li>
+        </ul>
       </div>
 
       {/* Toggle Drawer Button */}
@@ -78,8 +88,9 @@ export default function Dashboard() {
         ☰
       </button>
 
-          <div className={drawerOpen ? `${styles.page} ${styles.pageShift}` : styles.page}>
-          <h1 className={styles.title}>🏷️ All Auctions</h1>
+      {/* Page content */}
+      <div className={drawerOpen ? `${styles.page} ${styles.pageShift}` : styles.page}>
+        <h1 className={styles.title}>🏷️ All Auctions</h1>
 
         <div className={styles.grid}>
           {auctions.length ? (
@@ -103,7 +114,12 @@ export default function Dashboard() {
 
                 <div className={styles.actions}>
                   <button className={styles.bidButton}>Place Bid</button>
-                  <button className={styles.payButton}>Pay</button>
+                  <button
+                    className={styles.payButton}
+                    onClick={() => handlePay(auction._id)}
+                  >
+                    Pay
+                  </button>
                   {isAdmin && (
                     <button
                       className={styles.deleteButton}

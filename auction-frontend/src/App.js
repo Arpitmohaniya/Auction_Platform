@@ -6,6 +6,7 @@ import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AddAuctionPage from "./pages/AddAuctionPage";
+import PaymentPage from "./pages/PaymentPage";
 
 // Inside <Routes>
 function App() {
@@ -14,6 +15,10 @@ function App() {
       <Routes>
   <Route path="/" element={<LoginPage />} />
   <Route path="/register" element={<RegisterPage />} />
+  <Route path="/payment" element={<PaymentPage />} />
+  
+  {/* Protected Routes */}
+  
   <Route
     path="/dashboard"
     element={
@@ -22,6 +27,7 @@ function App() {
       </ProtectedRoute>
     }
   />
+  
   <Route
     path="/add"
     element={
@@ -32,6 +38,7 @@ function App() {
   />
 </Routes>
     </Router>
+    
   );
 }
 
