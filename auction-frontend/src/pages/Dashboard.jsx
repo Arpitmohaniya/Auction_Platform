@@ -8,7 +8,7 @@ export default function Dashboard() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const navigate = useNavigate(); // ✅ For navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAuctions = async () => {
@@ -33,7 +33,6 @@ export default function Dashboard() {
     fetchAuctions();
   }, []);
 
-  // ✅ Delete handler
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this auction?")) return;
 
@@ -46,12 +45,37 @@ export default function Dashboard() {
     } catch (err) {
       console.error("❌ Error deleting auction:", err);
     }
-    console.log("📦 Token in localStorage:", localStorage.getItem("token"));
   };
 
-  // ✅ Pay handler
   const handlePay = (auctionId) => {
     navigate("/payment");
+  };
+
+  const handleBid = async (auctionId) => {
+    const bidAmount = parseFloat(prompt("Enter your bid amount:"));
+    if (isNaN(bidAmount)) {
+      alert("Invalid bid amount!");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.post(
+        `/auction/${auctionId}/bid`,
+        { bidAmount },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert(res.data.message);
+
+      // Refresh auctions
+      const updated = await api.get("/auction");
+      setAuctions(updated.data.auctions);
+
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Bid failed");
+    }
   };
 
   return (
@@ -66,19 +90,13 @@ export default function Dashboard() {
         <h3 className={styles.drawerTitle}>Dashboard Menu</h3>
         <ul className={styles.menuList}>
           <li>
-            <a href="/dashboard" onClick={() => setDrawerOpen(false)}>
-              🏠 Home
-            </a>
+            <a href="/dashboard" onClick={() => setDrawerOpen(false)}>🏠 Home</a>
           </li>
           <li>
-            <a href="/payment" onClick={() => setDrawerOpen(false)}>
-              💳 Payment
-            </a>
+            <a href="/payment" onClick={() => setDrawerOpen(false)}>💳 Payment</a>
           </li>
           <li>
-            <a href="/" onClick={() => setDrawerOpen(false)}>
-              🔒 Logout
-            </a>
+            <a href="/" onClick={() => setDrawerOpen(false)}>🔒 Logout</a>
           </li>
         </ul>
       </div>
@@ -88,7 +106,6 @@ export default function Dashboard() {
         ☰
       </button>
 
-      {/* Page content */}
       <div className={drawerOpen ? `${styles.page} ${styles.pageShift}` : styles.page}>
         <h1 className={styles.title}>🏷️ All Auctions</h1>
 
@@ -98,7 +115,9 @@ export default function Dashboard() {
               <div key={auction._id} className={styles.card}>
                 <h2>{auction.title}</h2>
                 <p>{auction.description}</p>
-                <p><strong>Starting Bid:</strong> ₹{auction.startingBid}</p>
+                <p>
+                  <strong>Current Bid:</strong> ₹{auction.highestBid || auction.startingBid}
+                </p>
 
                 {auction.imageUrl && (
                   <img
@@ -113,22 +132,29 @@ export default function Dashboard() {
                 </p>
 
                 <div className={styles.actions}>
-                  <button className={styles.bidButton}>Place Bid</button>
-                  <button
-                    className={styles.payButton}
-                    onClick={() => handlePay(auction._id)}
-                  >
-                    Pay
-                  </button>
-                  {isAdmin && (
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() => handleDelete(auction._id)}
-                    >
-                      🗑️ Delete
-                    </button>
-                  )}
-                </div>
+               <button
+                className={styles.bidButton}
+                onClick={() => handleBid(auction._id)}
+               >
+                 Place Bid
+               </button>
+
+               <button
+                className={styles.payButton}
+                onClick={() => handlePay(auction._id)}
+                >
+                 Pay
+                </button>
+
+                {isAdmin && (
+                 <button
+                 className={styles.deleteButton}
+      onClick={() => handleDelete(auction._id)}
+    >
+      🗑️ Delete
+    </button>
+  )}
+</div>
               </div>
             ))
           ) : (
