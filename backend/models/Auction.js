@@ -4,8 +4,13 @@ const auctionSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   startingBid: { type: Number, required: true },
-  highestBid: { type: Number, default: 0 }, 
+  highestBid: { type: Number, default: 0 },
   imageUrl: { type: String },
+  details: { type: String, required: true },
+  condition: { type: String },
+  warranty: { type: String },
+  location: { type: String },
+  contactInfo: { type: String },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 

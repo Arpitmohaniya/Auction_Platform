@@ -8,18 +8,18 @@ const isAdmin = require("../middleware/isAdmin");
 
 // ✅ Create new auction
 router.post("/", auth, upload.single("image"), async (req, res) => {
-  const { title, description, startingBid } = req.body;
+const { title, description, productDetails, startingBid } = req.body;
 
   console.log("REQ BODY:", req.body);
   console.log("REQ FILE:", req.file);
 
-  const auction = new Auction({
-    title,
-    description,
-    startingBid: Number(startingBid),
-    highestBid: Number(startingBid), // ✅ initialize highestBid to startingBid
-    imageUrl: req.file ? req.file.path : "",
-    createdBy: req.user.id,
+const auction = new Auction({
+  title,
+  description,
+  productDetails, // ✅
+  startingBid: Number(startingBid),
+  imageUrl: req.file ? req.file.path : "",
+  createdBy: req.user.id,
   });
 
   await auction.save();
@@ -80,5 +80,19 @@ router.post("/:id/bid", auth, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+router.get("/:id", async (req, res) => {
+  try {
+    const auction = await Auction.findById(req.params.id).populate("createdBy", "name");
+    if (!auction) {
+      return res.status(404).json({ message: "Auction not found" });
+    }
+    res.json({ auction });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 module.exports = router;

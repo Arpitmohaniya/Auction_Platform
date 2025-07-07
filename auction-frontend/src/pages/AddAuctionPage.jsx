@@ -7,17 +7,19 @@ export default function AddAuctionPage() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    startingBid: "", // Will handle this correctly below
+    startingBid: "",
+    details: "",
+    condition: "",
+    warranty: "",
+    location: "",
+    contactInfo: "",
   });
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const navigate = useNavigate();
 
-  // ✅ Handles text input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // 👇 Make sure startingBid stays a number
     if (name === "startingBid") {
       setForm({ ...form, [name]: value.replace(/[^0-9]/g, "") });
     } else {
@@ -25,7 +27,6 @@ export default function AddAuctionPage() {
     }
   };
 
-  // ✅ Handles file input
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
@@ -36,21 +37,15 @@ export default function AddAuctionPage() {
     }
   };
 
-  // ✅ Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const token = localStorage.getItem("token");
     const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("description", form.description);
-
-    // 👇 Ensure startingBid is a real number (send as string is fine with FormData)
-    formData.append("startingBid", Number(form.startingBid));
-
-    if (image) {
-      formData.append("image", image);
-    }
+    Object.keys(form).forEach((key) => {
+      formData.append(key, form[key]);
+    });
+    if (image) formData.append("image", image);
 
     try {
       await api.post("/auction", formData, {
@@ -83,8 +78,17 @@ export default function AddAuctionPage() {
         <textarea
           name="description"
           className={styles.input}
-          placeholder="Description"
+          placeholder="Short Description"
           value={form.description}
+          onChange={handleChange}
+          required
+        />
+
+        <textarea
+          name="details"
+          className={styles.input}
+          placeholder="Full Product Details"
+          value={form.details}
           onChange={handleChange}
           required
         />
@@ -93,11 +97,43 @@ export default function AddAuctionPage() {
           name="startingBid"
           className={styles.input}
           type="number"
-          placeholder="Starting Bid"
+          placeholder="Starting Bid (₹)"
           value={form.startingBid}
           onChange={handleChange}
           required
           min="0"
+        />
+
+        <input
+          name="condition"
+          className={styles.input}
+          placeholder="Condition (e.g., New, Used)"
+          value={form.condition}
+          onChange={handleChange}
+        />
+
+        <input
+          name="warranty"
+          className={styles.input}
+          placeholder="Warranty"
+          value={form.warranty}
+          onChange={handleChange}
+        />
+
+        <input
+          name="location"
+          className={styles.input}
+          placeholder="Location"
+          value={form.location}
+          onChange={handleChange}
+        />
+
+        <input
+          name="contactInfo"
+          className={styles.input}
+          placeholder="Contact Info"
+          value={form.contactInfo}
+          onChange={handleChange}
         />
 
         <input

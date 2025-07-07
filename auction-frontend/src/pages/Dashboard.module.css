@@ -1,27 +1,42 @@
-/* Dashboard.module.css */
-
 .wrapper {
-  position: relative;
-  min-height: 100vh;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+  background: #0d1b2a;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.toggleBtn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
 }
 
 .drawer {
   position: fixed;
   top: 0;
-  left: -250px; /* Hidden by default */
+  left: -250px;
   width: 250px;
   height: 100%;
-  background: #102e2f; /* Dark background */
+  background: #1b263b;
   color: #fff;
   transition: left 0.3s ease;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
   padding: 2rem 1rem;
-  z-index: 1000;
+  z-index: 999;
 }
 
 .drawerOpen {
-  left: 0; /* Slide in */
+  left: 0;
 }
 
 .closeBtn {
@@ -30,12 +45,11 @@
   color: #fff;
   font-size: 1.5rem;
   cursor: pointer;
-  margin-bottom: 2rem;
 }
 
 .drawerTitle {
+  margin-top: 2rem;
   font-size: 1.2rem;
-  margin-bottom: 1rem;
 }
 
 .menuList {
@@ -50,107 +64,83 @@
 .menuList a {
   color: #fff;
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
 }
-
-.menuList a:hover {
-  color: #00c6ff;
-}
-
-.toggleBtn {
-  position: fixed;
-  top: 1rem;
-  left: 1rem;
-  background: #1e1e2f;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-size: 1.2rem;
-  cursor: pointer;
-  border-radius: 4px;
-  z-index: 1100;
-}
-
 
 .page {
-  transition: margin-left 0.3s ease;
   margin-left: 0;
+  transition: margin-left 0.3s ease;
   padding: 2rem;
+  background: #f5f8fa;
+  min-height: 100vh;
 }
 
 .pageShift {
-  margin-left: 250px; 
+  margin-left: 250px;
 }
 
 .title {
   font-size: 2rem;
   margin-bottom: 1rem;
+  color: #0d1b2a;
 }
-
 
 .grid {
   display: grid;
+  gap: 2rem;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
 }
 
 .card {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
   transition: transform 0.2s;
 }
 
+.card:hover {
+  transform: translateY(-5px);
+}
+
 .image {
-  width: 100%;
-  border-radius: 8px;
-  margin-top: 10px;
-  object-fit: cover;
-  max-height: 180px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem 0;
+  border-radius: 10px;
 }
 
 .owner {
-  margin-top: 10px;
-  font-style: italic;
-  font-size: 14px;
+  font-size: 0.9rem;
   color: #555;
 }
 
 .actions {
-  margin-top: 15px;
-  display: flex;
-  gap: 10px;
+  margin-top: 1rem;
+}
+
+.bidButton,
+.payButton,
+.deleteButton {
+  margin-right: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
 }
 
 .bidButton {
-  flex: 1;
-  padding: 10px 0;
-  background-color: #4ade80;
+  background: #3fb68b;
   color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
 }
 
 .payButton {
-  flex: 1;
-  padding: 10px 0;
-  background-color: #3b82f6;
+  background: #1c7ed6;
   color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
 }
+
 .deleteButton {
-  background: #e63946;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-left: 8px;
+  background: #e03131;
+  color: #fff;
 }
