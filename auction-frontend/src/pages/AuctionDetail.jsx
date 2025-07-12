@@ -26,6 +26,7 @@ export default function AuctionDetail() {
       <h1>{auction.title}</h1>
       <p>{auction.description}</p>
       <p><strong>Current Bid:</strong> ₹{auction.highestBid || auction.startingBid}</p>
+
       {auction.imageUrl && (
         <img
           src={`http://localhost:5050/${auction.imageUrl}`}
@@ -33,6 +34,7 @@ export default function AuctionDetail() {
           className={styles.detailImage}
         />
       )}
+
       <div className={styles.extraDetails}>
         <p><strong>Full Details:</strong> {auction.details}</p>
         <p><strong>Condition:</strong> {auction.condition}</p>
@@ -40,6 +42,20 @@ export default function AuctionDetail() {
         <p><strong>Location:</strong> {auction.location}</p>
         <p><strong>Contact Info:</strong> {auction.contactInfo}</p>
       </div>
+
+      {auction.bids && auction.bids.length > 0 && (
+        <div className={styles.bidHistory}>
+          <h3>Bid History 🕒</h3>
+          <ul>
+            {auction.bids.map((bid) => (
+              <li key={bid._id}>
+                ₹{bid.amount} by {bid.user?.name || "Anonymous"} at{" "}
+                {new Date(bid.timestamp).toLocaleString()}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

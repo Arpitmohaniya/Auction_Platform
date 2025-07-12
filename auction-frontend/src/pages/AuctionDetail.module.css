@@ -22,3 +22,30 @@
   margin-top: 50px;
   font-size: 20px;
 }
+.bidHistory {
+  margin-top: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.bidHistory h3 {
+  margin-bottom: 0.5rem;
+  color: #0d1b2a;
+}
+
+.bidHistory ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bidHistory li {
+  padding: 6px 0;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.bidHistory li:last-child {
+  border-bottom: none;
+}

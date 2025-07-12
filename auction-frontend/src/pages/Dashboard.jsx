@@ -1,4 +1,5 @@
 // src/pages/Dashboard.jsx
+
 import { useEffect, useState } from "react";
 import api from "../axios";
 import styles from "./Dashboard.module.css";
@@ -8,6 +9,10 @@ export default function Dashboard() {
   const [auctions, setAuctions] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showBidModal, setShowBidModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedAuction, setSelectedAuction] = useState(null);
+  const [bidAmount, setBidAmount] = useState("");
 
   const navigate = useNavigate();
 
@@ -47,35 +52,61 @@ export default function Dashboard() {
     }
   };
 
-  const handlePay = (auctionId) => {
-    navigate("/payment");
+  // ✅ Open Bid Modal
+  const openBidModal = (auction) => {
+    setSelectedAuction(auction);
+    setBidAmount("");
+    setShowBidModal(true);
   };
 
-  const handleBid = async (id, e) => {
-  e.stopPropagation();
-  const input = prompt("Enter your bid amount:");
-  const bidAmount = parseFloat(input);
+  const closeBidModal = () => {
+    setShowBidModal(false);
+    setSelectedAuction(null);
+    setBidAmount("");
+  };
 
-  if (!bidAmount || isNaN(bidAmount)) {
-    alert("Invalid bid amount!");
-    return;
-  }
+  const handleBidSubmit = async () => {
+    if (!bidAmount || isNaN(bidAmount)) {
+      alert("Please enter a valid bid amount.");
+      return;
+    }
 
-  try {
-    const token = localStorage.getItem("token");
-    const res = await api.post(`/auction/${id}/bid`, { bidAmount }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.post(
+        `/auction/${selectedAuction._id}/bid`,
+        { bidAmount },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    alert(res.data.message);
-    const updated = await api.get("/auction");
-    setAuctions(updated.data.auctions);
-  } catch (err) {
-    console.error("❌ Bid Error:", err);
-    alert(err.response?.data?.message || "Bid failed");
-  }
-};
+      alert(res.data.message);
+      closeBidModal();
 
+      const updated = await api.get("/auction");
+      setAuctions(updated.data.auctions);
+    } catch (err) {
+      console.error("❌ Bid Error:", err);
+      alert(err.response?.data?.message || "Bid failed");
+    }
+  };
+
+  // ✅ Open Payment Modal
+  const openPaymentModal = (auction) => {
+    setSelectedAuction(auction);
+    setShowPaymentModal(true);
+  };
+
+  const closePaymentModal = () => {
+    setShowPaymentModal(false);
+    setSelectedAuction(null);
+  };
+
+  const handlePaymentSubmit = () => {
+    alert(`💸 Payment of ₹${selectedAuction?.highestBid || selectedAuction?.startingBid} confirmed!`);
+    closePaymentModal();
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -118,73 +149,120 @@ export default function Dashboard() {
           {auctions.length ? (
             auctions.map((auction) => (
               <div
-  key={auction._id}
-  className={styles.card}
-  onClick={() => navigate(`/auction/${auction._id}`)}
->
-    <div
-    className={`${styles.status} ${
-      auction.status === "Live"
-        ? styles.live
-        : auction.status === "Upcoming"
-        ? styles.upcoming
-        : styles.closed
-    }`}
-  >
-    {auction.status}
-  </div>
-  <h2 className={styles.cardTitle}>{auction.title}</h2>
-  <p className={styles.cardDescription}>{auction.description}</p>
-  <p className={styles.cardBid}>
-    <strong>Current Bid:</strong> ₹{auction.highestBid || auction.startingBid}
-  </p>
+                key={auction._id}
+                className={styles.card}
+                onClick={() => navigate(`/auction/${auction._id}`)}
+              >
+                <div
+                  className={`${styles.status} ${
+                    auction.status === "Live"
+                      ? styles.live
+                      : auction.status === "Upcoming"
+                      ? styles.upcoming
+                      : styles.closed
+                  }`}
+                >
+                  {auction.status}
+                </div>
 
+                <h2 className={styles.cardTitle}>{auction.title}</h2>
+                <p className={styles.cardDescription}>{auction.description}</p>
+                <p className={styles.cardBid}>
+                  <strong>Current Bid:</strong> ₹{auction.highestBid || auction.startingBid}
+                </p>
 
-  {auction.imageUrl && (
-    <img
-      src={`http://localhost:5050/${auction.imageUrl.replace(/^\/+/, "")}`}
-      alt={auction.title}
-      className={styles.cardImage}
-    />
-  )}
+                {auction.imageUrl && (
+                  <img
+                    src={`http://localhost:5050/${auction.imageUrl.replace(/^\/+/, "")}`}
+                    alt={auction.title}
+                    className={styles.cardImage}
+                  />
+                )}
 
-  <p className={styles.owner}>
-    🔗 Posted by: {auction.createdBy?.name || "Unknown"}
-  </p>
+                <p className={styles.owner}>
+                  🔗 Posted by: {auction.createdBy?.name || "Unknown"}
+                </p>
 
-  <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
-  <button
-    className={styles.bidButton}
-    onClick={() => handleBid(auction._id)}
-  >
-    Place Bid
-  </button>
+                <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className={styles.bidButton}
+                    onClick={() => openBidModal(auction)}
+                  >
+                    Place Bid
+                  </button>
 
-  <button
-    className={styles.payButton}
-    onClick={() => handlePay(auction._id)}
-  >
-    Pay
-  </button>
+                  <button
+                    className={styles.payButton}
+                    onClick={() => openPaymentModal(auction)}
+                  >
+                    Pay
+                  </button>
 
-  {isAdmin && (
-    <button
-      className={styles.deleteButton}
-      onClick={() => handleDelete(auction._id)}
-    >
-      Delete
-    </button>
-  )}
-</div>
-
-</div>
-
+                  {isAdmin && (
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => handleDelete(auction._id)}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </div>
             ))
           ) : (
             <p style={{ textAlign: "center" }}>No auctions found.</p>
           )}
         </div>
       </div>
+
+      {/* ✅ Bid Modal */}
+      {showBidModal && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modal}>
+            <h3>Place Bid for {selectedAuction?.title}</h3>
+            <p>
+              Current: ₹
+              {selectedAuction?.highestBid || selectedAuction?.startingBid}
+            </p>
+            <input
+              type="number"
+              placeholder="Your bid amount"
+              value={bidAmount}
+              onChange={(e) => setBidAmount(e.target.value)}
+              className={styles.input}
+            />
+            <div className={styles.modalActions}>
+              <button onClick={handleBidSubmit} className={styles.confirmButton}>
+                Confirm Bid
+              </button>
+              <button onClick={closeBidModal} className={styles.cancelButton}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Payment Modal */}
+      {showPaymentModal && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modal}>
+            <h3>💳 Pay for {selectedAuction?.title}</h3>
+            <p>
+              Amount: ₹
+              {selectedAuction?.highestBid || selectedAuction?.startingBid}
+            </p>
+            <div className={styles.modalActions}>
+              <button onClick={handlePaymentSubmit} className={styles.confirmButton}>
+                Confirm Payment
+              </button>
+              <button onClick={closePaymentModal} className={styles.cancelButton}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

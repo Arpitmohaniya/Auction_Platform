@@ -12,6 +12,7 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
     description,
     details,
     startingBid,
+    status,
     condition,
     warranty,
     location,
@@ -26,6 +27,7 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
     description,
     details, // must match your schema exactly!
     startingBid: Number(startingBid),
+    status: status || "Live",
     condition,
     warranty,
     location,
@@ -52,7 +54,10 @@ router.get("/", async (req, res) => {
 // ✅ Get single auction
 router.get("/:id", async (req, res) => {
   try {
-    const auction = await Auction.findById(req.params.id).populate("createdBy", "name");
+    const auction = await Auction.findById(req.params.id)
+      .populate("createdBy", "name")
+      .populate("bids.user", "name"); // 👈 to get bidder names
+
     if (!auction) {
       return res.status(404).json({ message: "Auction not found" });
     }
@@ -62,6 +67,7 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 // ✅ Delete auction by ID (Admin only)
 router.delete("/:id", auth, isAdmin, async (req, res) => {
@@ -97,14 +103,17 @@ router.post("/:id/bid", auth, async (req, res) => {
       });
     }
 
-    // ✅ Safe update - does NOT re-validate whole doc!
-    await Auction.findByIdAndUpdate(
-      req.params.id,
-      { highestBid: bidAmount },
-      { new: true }
-    );
+    auction.highestBid = bidAmount;
 
-    res.json({ success: true, message: "Bid placed successfully!" });
+    // ✅ NEW: Push bid to history
+    auction.bids.push({
+      user: req.user.id,
+      amount: bidAmount,
+    });
+
+    await auction.save();
+
+    res.json({ success: true, message: "Bid placed successfully!", auction });
   } catch (err) {
     console.error("❌ Error placing bid:", err);
     res.status(500).json({ message: "Server error" });
