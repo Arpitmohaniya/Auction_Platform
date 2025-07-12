@@ -7,8 +7,9 @@ export default function AddAuctionPage() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    startingBid: "",
     details: "",
+    status: "Live",
+    startingBid: "",
     condition: "",
     warranty: "",
     location: "",
@@ -30,11 +31,7 @@ export default function AddAuctionPage() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
-    if (file) {
-      setPreview(URL.createObjectURL(file));
-    } else {
-      setPreview(null);
-    }
+    setPreview(file ? URL.createObjectURL(file) : null);
   };
 
   const handleSubmit = async (e) => {
@@ -42,10 +39,14 @@ export default function AddAuctionPage() {
 
     const token = localStorage.getItem("token");
     const formData = new FormData();
-    Object.keys(form).forEach((key) => {
-      formData.append(key, form[key]);
+
+    Object.entries(form).forEach(([key, value]) => {
+      formData.append(key, value);
     });
-    if (image) formData.append("image", image);
+
+    if (image) {
+      formData.append("image", image);
+    }
 
     try {
       await api.post("/auction", formData, {
@@ -56,7 +57,10 @@ export default function AddAuctionPage() {
       });
       navigate("/dashboard");
     } catch (err) {
-      alert("Failed to create auction: " + (err.response?.data?.message || err.message));
+      alert(
+        "Failed to create auction: " +
+          (err.response?.data?.message || err.message)
+      );
       console.error("❌ Create auction error:", err.response?.data || err.message);
     }
   };
@@ -93,6 +97,17 @@ export default function AddAuctionPage() {
           required
         />
 
+        <select
+          name="status"
+          className={styles.input}
+          value={form.status || "Live"}
+          onChange={handleChange}
+       >
+       <option value="Live">Live</option>
+       <option value="Upcoming">Upcoming</option>
+       <option value="Closed">Closed</option>
+       </select>
+
         <input
           name="startingBid"
           className={styles.input}
@@ -115,7 +130,7 @@ export default function AddAuctionPage() {
         <input
           name="warranty"
           className={styles.input}
-          placeholder="Warranty"
+          placeholder="Warranty Details"
           value={form.warranty}
           onChange={handleChange}
         />
@@ -123,7 +138,7 @@ export default function AddAuctionPage() {
         <input
           name="location"
           className={styles.input}
-          placeholder="Location"
+          placeholder="Product Location"
           value={form.location}
           onChange={handleChange}
         />
@@ -131,7 +146,7 @@ export default function AddAuctionPage() {
         <input
           name="contactInfo"
           className={styles.input}
-          placeholder="Contact Info"
+          placeholder="Contact Information"
           value={form.contactInfo}
           onChange={handleChange}
         />
