@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../axios";
 import styles from "./AuctionDetail.module.css";
+import formatTimeRemaining from "../utils/formatTimeRemaining";
+
 
 export default function AuctionDetail() {
   const { id } = useParams();
@@ -41,6 +43,8 @@ export default function AuctionDetail() {
         <p><strong>Warranty:</strong> {auction.warranty}</p>
         <p><strong>Location:</strong> {auction.location}</p>
         <p><strong>Contact Info:</strong> {auction.contactInfo}</p>
+        <p><strong>Ends in:</strong> {formatTimeRemaining(auction.endTime)}</p>
+
       </div>
 
       {auction.bids && auction.bids.length > 0 && (

@@ -20,6 +20,7 @@ const auctionSchema = new mongoose.Schema({
   imageUrl: { type: String },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   status: { type: String, default: "Live" },
+  endTime: { type: Date, required: true },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Auction", auctionSchema);

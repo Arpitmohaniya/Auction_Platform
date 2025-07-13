@@ -131,6 +131,13 @@
   margin-bottom: 10px;
 }
 
+.cardTime {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #e53935;
+  margin: 10px 0;
+}
+
 .owner {
   font-size: 0.9rem;
   color: #555;

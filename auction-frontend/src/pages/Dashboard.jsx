@@ -4,14 +4,20 @@ import { useEffect, useState } from "react";
 import api from "../axios";
 import styles from "./Dashboard.module.css";
 import { useNavigate } from "react-router-dom";
+import Countdown from "../components/Countdown";
 
 export default function Dashboard() {
   const [auctions, setAuctions] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+
   const [showBidModal, setShowBidModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const [selectedAuction, setSelectedAuction] = useState(null);
+  const [auctionToDelete, setAuctionToDelete] = useState(null);
+
   const [bidAmount, setBidAmount] = useState("");
 
   const navigate = useNavigate();
@@ -38,21 +44,30 @@ export default function Dashboard() {
     fetchAuctions();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this auction?")) return;
+  // ✅ Confirm Delete Modal instead of window.confirm
+  const confirmDelete = (auction) => {
+    setAuctionToDelete(auction);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!auctionToDelete) return;
 
     try {
       const token = localStorage.getItem("token");
-      await api.delete(`/auction/${id}`, {
+      await api.delete(`/auction/${auctionToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAuctions(auctions.filter((a) => a._id !== id));
+      setAuctions(auctions.filter((a) => a._id !== auctionToDelete._id));
     } catch (err) {
       console.error("❌ Error deleting auction:", err);
+    } finally {
+      setShowDeleteModal(false);
+      setAuctionToDelete(null);
     }
   };
 
-  // ✅ Open Bid Modal
+  // ✅ Bid modal handlers
   const openBidModal = (auction) => {
     setSelectedAuction(auction);
     setBidAmount("");
@@ -92,7 +107,7 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ Open Payment Modal
+  // ✅ Payment modal handlers
   const openPaymentModal = (auction) => {
     setSelectedAuction(auction);
     setShowPaymentModal(true);
@@ -170,6 +185,9 @@ export default function Dashboard() {
                 <p className={styles.cardBid}>
                   <strong>Current Bid:</strong> ₹{auction.highestBid || auction.startingBid}
                 </p>
+                <p className={styles.cardTime}>
+                  ⏰ Ends in: <Countdown endTime={auction.endTime} />
+                </p>
 
                 {auction.imageUrl && (
                   <img
@@ -201,7 +219,7 @@ export default function Dashboard() {
                   {isAdmin && (
                     <button
                       className={styles.deleteButton}
-                      onClick={() => handleDelete(auction._id)}
+                      onClick={() => confirmDelete(auction)}
                     >
                       Delete
                     </button>
@@ -257,6 +275,24 @@ export default function Dashboard() {
                 Confirm Payment
               </button>
               <button onClick={closePaymentModal} className={styles.cancelButton}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modal}>
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete <strong>{auctionToDelete?.title}</strong>?</p>
+            <div className={styles.modalActions}>
+              <button onClick={handleDelete} className={styles.confirmButton}>
+                Yes, Delete
+              </button>
+              <button onClick={() => setShowDeleteModal(false)} className={styles.cancelButton}>
                 Cancel
               </button>
             </div>
