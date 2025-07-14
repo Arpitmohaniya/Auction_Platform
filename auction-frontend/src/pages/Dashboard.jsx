@@ -1,5 +1,3 @@
-// src/pages/Dashboard.jsx
-
 import { useEffect, useState } from "react";
 import api from "../axios";
 import styles from "./Dashboard.module.css";
@@ -10,15 +8,14 @@ export default function Dashboard() {
   const [auctions, setAuctions] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-
   const [showBidModal, setShowBidModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const [selectedAuction, setSelectedAuction] = useState(null);
-  const [auctionToDelete, setAuctionToDelete] = useState(null);
-
   const [bidAmount, setBidAmount] = useState("");
+
+  // ✅ New states for custom delete confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [auctionToDelete, setAuctionToDelete] = useState(null);
 
   const navigate = useNavigate();
 
@@ -44,30 +41,31 @@ export default function Dashboard() {
     fetchAuctions();
   }, []);
 
-  // ✅ Confirm Delete Modal instead of window.confirm
-  const confirmDelete = (auction) => {
+  // ✅ Open custom delete confirmation modal
+  const openDeleteModal = (auction) => {
     setAuctionToDelete(auction);
     setShowDeleteModal(true);
   };
 
-  const handleDelete = async () => {
-    if (!auctionToDelete) return;
+  const closeDeleteModal = () => {
+    setAuctionToDelete(null);
+    setShowDeleteModal(false);
+  };
 
+  const confirmDelete = async () => {
     try {
       const token = localStorage.getItem("token");
       await api.delete(`/auction/${auctionToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAuctions(auctions.filter((a) => a._id !== auctionToDelete._id));
+      closeDeleteModal();
     } catch (err) {
       console.error("❌ Error deleting auction:", err);
-    } finally {
-      setShowDeleteModal(false);
-      setAuctionToDelete(null);
     }
   };
 
-  // ✅ Bid modal handlers
+  // ✅ Bid modal
   const openBidModal = (auction) => {
     setSelectedAuction(auction);
     setBidAmount("");
@@ -107,7 +105,7 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ Payment modal handlers
+  // ✅ Payment modal
   const openPaymentModal = (auction) => {
     setSelectedAuction(auction);
     setShowPaymentModal(true);
@@ -119,7 +117,9 @@ export default function Dashboard() {
   };
 
   const handlePaymentSubmit = () => {
-    alert(`💸 Payment of ₹${selectedAuction?.highestBid || selectedAuction?.startingBid} confirmed!`);
+    alert(
+      `💸 Payment of ₹${selectedAuction?.highestBid || selectedAuction?.startingBid} confirmed!`
+    );
     closePaymentModal();
   };
 
@@ -219,7 +219,7 @@ export default function Dashboard() {
                   {isAdmin && (
                     <button
                       className={styles.deleteButton}
-                      onClick={() => confirmDelete(auction)}
+                      onClick={() => openDeleteModal(auction)}
                     >
                       Delete
                     </button>
@@ -286,13 +286,16 @@ export default function Dashboard() {
       {showDeleteModal && (
         <div className={styles.modalBackdrop}>
           <div className={styles.modal}>
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete <strong>{auctionToDelete?.title}</strong>?</p>
+            <h3>⚠️ Confirm Delete</h3>
+            <p>
+              Are you sure you want to delete{" "}
+              <strong>{auctionToDelete?.title}</strong>?
+            </p>
             <div className={styles.modalActions}>
-              <button onClick={handleDelete} className={styles.confirmButton}>
+              <button onClick={confirmDelete} className={styles.confirmButton}>
                 Yes, Delete
               </button>
-              <button onClick={() => setShowDeleteModal(false)} className={styles.cancelButton}>
+              <button onClick={closeDeleteModal} className={styles.cancelButton}>
                 Cancel
               </button>
             </div>

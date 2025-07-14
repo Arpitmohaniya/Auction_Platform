@@ -5,39 +5,48 @@ const upload = require("../middleware/upload");
 const auth = require("../middleware/authMiddleware");
 const isAdmin = require("../middleware/isAdmin");
 
-// ✅ Create new auction
+// ✅ Create new auction (Single image only)
 router.post("/", auth, upload.single("image"), async (req, res) => {
-  const {
-    title,
-    description,
-    details,
-    startingBid,
-    status,
-    condition,
-    warranty,
-    location,
-    contactInfo,
-  } = req.body;
+  try {
+    const {
+      title,
+      description,
+      details,
+      startingBid,
+      status,
+      condition,
+      warranty,
+      location,
+      contactInfo,
+      endTime, // ✅ Make sure endTime is passed from frontend!
+    } = req.body;
 
-  console.log("REQ BODY:", req.body);
-  console.log("REQ FILE:", req.file);
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required." });
+    }
 
-  const auction = new Auction({
-    title,
-    description,
-    details, // must match your schema exactly!
-    startingBid: Number(startingBid),
-    status: status || "Live",
-    condition,
-    warranty,
-    location,
-    contactInfo,
-    imageUrl: req.file ? req.file.path : "",
-    createdBy: req.user.id,
-  });
+    const auction = new Auction({
+      title,
+      description,
+      details,
+      startingBid: Number(startingBid),
+      status: status || "Live",
+      condition,
+      warranty,
+      location,
+      contactInfo,
+      imageUrl: req.file.path, // ✅ SINGLE image
+      createdBy: req.user.id,
+      endTime: endTime, // ✅ Required in your schema
+    });
 
-  await auction.save();
-  res.status(201).json({ success: true, auction });
+    await auction.save();
+    res.status(201).json({ success: true, auction });
+
+  } catch (err) {
+    console.error("❌ Create auction error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // ✅ Fetch all auctions
@@ -51,25 +60,25 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ Get single auction
+// ✅ Get single auction by ID
 router.get("/:id", async (req, res) => {
   try {
     const auction = await Auction.findById(req.params.id)
       .populate("createdBy", "name")
-      .populate("bids.user", "name"); // 👈 to get bidder names
+      .populate("bids.user", "name");
 
     if (!auction) {
       return res.status(404).json({ message: "Auction not found" });
     }
-    res.json({ auction });
+
+    res.json({ success: true, auction });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("❌ Get auction error:", err);
+    res.status(500).json({ message: err.message });
   }
 });
 
-
-// ✅ Delete auction by ID (Admin only)
+// ✅ Delete auction (Admin only)
 router.delete("/:id", auth, isAdmin, async (req, res) => {
   try {
     const auction = await Auction.findById(req.params.id);
@@ -78,14 +87,14 @@ router.delete("/:id", auth, isAdmin, async (req, res) => {
     }
 
     await auction.deleteOne();
-    res.json({ message: "Auction removed successfully" });
+    res.json({ success: true, message: "Auction deleted successfully." });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Delete auction error:", err);
     res.status(500).json({ message: err.message });
   }
 });
 
-// ✅ Place a bid safely
+// ✅ Place a bid
 router.post("/:id/bid", auth, async (req, res) => {
   const { bidAmount } = req.body;
 
@@ -95,17 +104,15 @@ router.post("/:id/bid", auth, async (req, res) => {
       return res.status(404).json({ message: "Auction not found" });
     }
 
-    const current = auction.highestBid > 0 ? auction.highestBid : auction.startingBid;
+    const currentBid = auction.highestBid > 0 ? auction.highestBid : auction.startingBid;
 
-    if (bidAmount <= current) {
+    if (bidAmount <= currentBid) {
       return res.status(400).json({
-        message: `Bid must be greater than the current bid (₹${current})`
+        message: `Bid must be greater than the current bid (₹${currentBid})`,
       });
     }
 
     auction.highestBid = bidAmount;
-
-    // ✅ NEW: Push bid to history
     auction.bids.push({
       user: req.user.id,
       amount: bidAmount,
@@ -115,8 +122,8 @@ router.post("/:id/bid", auth, async (req, res) => {
 
     res.json({ success: true, message: "Bid placed successfully!", auction });
   } catch (err) {
-    console.error("❌ Error placing bid:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error("❌ Place bid error:", err);
+    res.status(500).json({ message: err.message });
   }
 });
 

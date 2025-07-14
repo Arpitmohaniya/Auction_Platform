@@ -14,18 +14,17 @@ export default function AddAuctionPage() {
     warranty: "",
     location: "",
     contactInfo: "",
+    endTime: "",
   });
-  const [image, setImage] = useState(null);
+
+  const [image, setImage] = useState(null); // ✅ SINGLE image only
   const [preview, setPreview] = useState(null);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "startingBid") {
-      setForm({ ...form, [name]: value.replace(/[^0-9]/g, "") });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
+    setForm({ ...form, [name]: value });
   };
 
   const handleImageChange = (e) => {
@@ -46,6 +45,9 @@ export default function AddAuctionPage() {
 
     if (image) {
       formData.append("image", image);
+    } else {
+      alert("Please select an image.");
+      return;
     }
 
     try {
@@ -55,112 +57,127 @@ export default function AddAuctionPage() {
           "Content-Type": "multipart/form-data",
         },
       });
+
       navigate("/dashboard");
     } catch (err) {
+      console.error(err);
       alert(
         "Failed to create auction: " +
           (err.response?.data?.message || err.message)
       );
-      console.error("❌ Create auction error:", err.response?.data || err.message);
     }
   };
 
   return (
     <div className={styles.container}>
       <form onSubmit={handleSubmit} className={styles.formBox}>
-        <h2 className={styles.h2}>Create New Auction</h2>
+        <h2>Create New Auction</h2>
 
         <input
           name="title"
-          className={styles.input}
-          placeholder="Auction Title"
+          placeholder="Title"
           value={form.title}
           onChange={handleChange}
           required
+          className={styles.input}
         />
 
         <textarea
           name="description"
-          className={styles.input}
           placeholder="Short Description"
           value={form.description}
           onChange={handleChange}
           required
+          className={styles.input}
         />
 
         <textarea
           name="details"
-          className={styles.input}
-          placeholder="Full Product Details"
+          placeholder="Full Details"
           value={form.details}
           onChange={handleChange}
           required
+          className={styles.input}
         />
 
         <select
           name="status"
-          className={styles.input}
-          value={form.status || "Live"}
+          value={form.status}
           onChange={handleChange}
-       >
-       <option value="Live">Live</option>
-       <option value="Upcoming">Upcoming</option>
-       <option value="Closed">Closed</option>
-       </select>
+          className={styles.input}
+        >
+          <option value="Live">Live</option>
+          <option value="Upcoming">Upcoming</option>
+          <option value="Closed">Closed</option>
+        </select>
 
         <input
           name="startingBid"
-          className={styles.input}
           type="number"
           placeholder="Starting Bid (₹)"
           value={form.startingBid}
           onChange={handleChange}
           required
           min="0"
+          className={styles.input}
         />
 
         <input
           name="condition"
-          className={styles.input}
-          placeholder="Condition (e.g., New, Used)"
+          placeholder="Condition"
           value={form.condition}
           onChange={handleChange}
+          className={styles.input}
         />
 
         <input
           name="warranty"
-          className={styles.input}
-          placeholder="Warranty Details"
+          placeholder="Warranty"
           value={form.warranty}
           onChange={handleChange}
+          className={styles.input}
         />
 
         <input
           name="location"
-          className={styles.input}
-          placeholder="Product Location"
+          placeholder="Location"
           value={form.location}
           onChange={handleChange}
+          className={styles.input}
         />
 
         <input
           name="contactInfo"
-          className={styles.input}
-          placeholder="Contact Information"
+          placeholder="Contact Info"
           value={form.contactInfo}
           onChange={handleChange}
+          className={styles.input}
+        />
+
+        <label>End Time:</label>
+        <input
+          name="endTime"
+          type="datetime-local"
+          value={form.endTime}
+          onChange={handleChange}
+          required
+          className={styles.input}
         />
 
         <input
           type="file"
           accept="image/*"
-          className={styles.input}
           onChange={handleImageChange}
           required
+          className={styles.input}
         />
 
         {preview && (
-          <img src={preview} alt="Preview" className={styles.preview} />
+          <img
+            src={preview}
+            alt="Preview"
+            className={styles.preview}
+          />
         )}
 
         <button type="submit" className={styles.button}>
