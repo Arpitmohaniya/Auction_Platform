@@ -295,3 +295,88 @@
 .cancelButton:hover {
   background: #5a6268;
 }
+.emptyState {
+  text-align: center;
+  margin: 4rem auto;
+}
+
+.emptyState h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.emptyState p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.addAuctionBtn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.addAuctionBtn:hover {
+  background-color: #0056b3;
+}
+/* Add to your Dashboard.module.css */
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.select {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.emptyState {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem;
+  border: 2px dashed #ccc;
+  border-radius: 1rem;
+}
+
+.addAuctionBtn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.addAuctionBtn:hover {
+  background: #0056b3;
+}
+
+.confirmButton {
+  background: #28a745;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+}
+
+.cancelButton {
+  background: #dc3545;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  margin-left: 1rem;
+}
