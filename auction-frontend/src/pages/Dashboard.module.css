@@ -380,3 +380,90 @@
   cursor: pointer;
   margin-left: 1rem;
 }
+
+/* 📱 Responsive Adjustments for Mobile */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .cardTitle {
+    font-size: 1.1rem;
+  }
+
+  .cardDescription,
+  .cardBid,
+  .cardTime,
+  .owner {
+    font-size: 0.9rem;
+  }
+
+  .cardImage {
+    max-height: 200px;
+    object-fit: cover;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .bidButton,
+  .payButton,
+  .deleteButton {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .navbar {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .drawer {
+    width: 100%;
+    left: -100%;
+  }
+
+  .drawerOpen {
+    left: 0;
+  }
+
+  .modal {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .select {
+    width: 100%;
+  }
+
+  .addAuctionBtn {
+    width: 100%;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+
+  .confirmButton,
+  .cancelButton {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .cancelButton {
+    margin-top: 0.5rem;
+  }
+}
